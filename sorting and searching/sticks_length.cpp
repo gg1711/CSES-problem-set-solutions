@@ -33,20 +33,27 @@ ll getCost(vecll &len, ll reqLen){
 
 void solve(){
 	ll n;
+	cin>>n;
 	vecll len(n);
 	for(ll idx=0;idx<n;idx++)
 		cin>>len[idx];
 
 	ll low=1,high=1e9+5,ans=getCost(len, high);
-	while(low<=high){
-		ll mid  = (low+high)/2;
-		chk4(low,mid,high,ans);
-		if(getCost(len, mid) < ans){
-			ans = getCost(len, mid);
-			high = mid -1;
+	while(true){
+		ll part = (high-low)/3;
+		ll m1 = low + part;
+		ll m2 = high - part;
+		// chk4(low, high, ans, part);
+		if(part==0) break; 
+		if(getCost(len, m1) > getCost(len, m2)){
+			low = m1 + 1;
 		}
-		else high = mid -1;
+		else{
+			high = m2 - 1;
+		}
 	}
+	for(ll val=low;val<=high;val++)
+		ans =  min(ans, getCost(len, val));
 	cout<<ans<<endl;
 }
 
