@@ -22,57 +22,25 @@ using namespace std;
 #define S second
 #define size(a)	(int)a.size()
 
-ll getCost(vecll &len, ll reqLen){
-	ll cost=0;
-	for(ll idx=0;idx<size(len);idx++){
-		cost+=abs(len[idx]-reqLen);
-	}
-	return cost;
-}
-
-
 void solve(){
-	ll n;
-	cin>>n;
-	vecll len(n);
+	ll n,x;
+	cin>>n>>x;
+	vecll a(n);
 	for(ll idx=0;idx<n;idx++)
-		cin>>len[idx];
-
-	ll low=1,high=1e9+5,ans=getCost(len, high);
-	while(true){
-		ll part = (high-low)/3;
-		ll m1 = low + part;
-		ll m2 = high - part;
-		// chk4(low, high, ans, part);
-		if(part==0) break; 
-		if(getCost(len, m1) > getCost(len, m2)){
-			low = m1 + 1;
-		}
-		else{
-			high = m2 - 1;
-		}
+		cin>>a[idx];
+	map<ll,ll> mp;
+	mp[0]++;
+	ll sum=0,cnt=0;
+	for(ll idx=0;idx<n;idx++){
+		sum+=a[idx];
+		if(mp.count(sum - x) > 0) cnt+=mp[sum-x];
+		mp[sum]++;
 	}
-	for(ll val=low;val<=high;val++)
-		ans =  min(ans, getCost(len, val));
-	cout<<ans<<endl;
-}
-
-int solve2(){
-	ll n;
-	cin>>n;
-	vecll len(n);
-	for(ll idx=0;idx<n;idx++)
-		cin>>len[idx];
-
-	sort(all(len));
-	ll sum=0;
-	for(ll val:len)
-		sum+=abs(len[n/2]-val);
-	cout<<sum<<endl;
+	cout<<cnt<<endl;
 }
 
 int main(){
 	FAST;
-	solve2();
+	solve();
 	return 0;
 }
