@@ -23,52 +23,42 @@ using namespace std;
 #define size(a)	(int)a.size()
 
 ll inf = 1e10;
-const ll N = 1e6+5;
-ll dp[N][105];
 
-ll memo(vecll &coin, ll val, ll idx){
-	//can't do space optimisation in top down 
+ll dp[1005][1005];
+
+ll paths(vector<string>&grid, ll r,ll c){
+	if(r>=size(grid) || c>=size(grid) || r<0 || c<0) return 0;
+	
+	if(grid[r][c]=='*') return 0;
+
+	if(r==size(grid)-1 && c==size(grid)-1)
+		return 1;
+
+	if(dp[r][c]!=-1) return dp[r][c];
+
+	ll cnt=0;
+	cnt+=paths(grid,r+1,c);
+	cnt%=mod;
+	cnt+=paths(grid,r,c+1);	
+	cnt%=mod;
+
+	return dp[r][c] = cnt;
 }
 
 //topDown
 void solve(){
-	ll n,x;
-	cin>>n>>x;
-
-	vecll coin(n);
-	for(ll &i:coin) cin>>i;
+	ll n;
+	cin>>n;
+	vector<string>grid(n);
 	memset(dp,-1,sizeof(dp));
-	ll ans = memo(coin,x,0);
+	for(auto &str:grid)
+		cin>>str;
 
-	cout<<ans<<endl;
-
-}
-
-//BottomUp
-void solve2(){
-	ll n,x;
-	cin>>n>>x;
-
-	vecll coin(n);
-	for(ll &i:coin) cin>>i;
-
-	//no of ways to form x
-	vecll dp(x+1,0);
-
-	dp[0]=1;
-	sort(all(coin));
-	for(ll c:coin){
-		for(ll val=1;val<=x;val++)
-			if(val >= c){
-				dp[val]+=dp[val-c];
-				dp[val]%=mod;
-			}
-	}
-	cout<<dp[x]<<endl;
+	cout<<paths(grid,0,0)<<endl;
 }
 
 int main(){
 	FAST;
-	solve2();
+	solve();
 	return 0;
 }

@@ -20,55 +20,60 @@ using namespace std;
 #define mod 1000000007
 #define F first
 #define S second
-#define size(a)	(int)a.size()
+#define sz(a)	(int)(a).size()
 
 ll inf = 1e10;
-const ll N = 1e6+5;
-ll dp[N][105];
 
-ll memo(vecll &coin, ll val, ll idx){
-	//can't do space optimisation in top down 
+vector<veci> dp;
+
+ll memo(veci &price, veci &pages, ll val, ll idx){
+	if(val < 0) return -inf;
+	if(idx>=size(price)) return 0;
+	if(dp[val][idx]!=-1) return dp[val][idx];
+	return dp[val][idx] = max(memo(price, pages, val,idx+1),pages[idx] +  memo(price, pages, val - price[idx], idx+1));
 }
 
 //topDown
-void solve(){
-	ll n,x;
+void solve2(){
+	ll n, x;
 	cin>>n>>x;
 
-	vecll coin(n);
-	for(ll &i:coin) cin>>i;
-	memset(dp,-1,sizeof(dp));
-	ll ans = memo(coin,x,0);
+	veci price(n), pages(n);
 
-	cout<<ans<<endl;
+	for(auto &i:price) cin>>i;
+	for(auto &i:pages) cin>>i;
 
+	dp.assign(x+2,veci(n+2,-1));
+
+	cout<<memo(price, pages,x,0)<<endl;;
 }
 
-//BottomUp
-void solve2(){
-	ll n,x;
+
+//bottomUp
+void solve(){
+	ll n, x;
 	cin>>n>>x;
 
-	vecll coin(n);
-	for(ll &i:coin) cin>>i;
+	vecll price(n), pages(n);
 
-	//no of ways to form x
+	for(auto &i:price) cin>>i;
+	for(auto &i:pages) cin>>i;
+
 	vecll dp(x+1,0);
-
-	dp[0]=1;
-	sort(all(coin));
-	for(ll c:coin){
-		for(ll val=1;val<=x;val++)
-			if(val >= c){
-				dp[val]+=dp[val-c];
-				dp[val]%=mod;
-			}
+	
+	for(ll idx=0;idx<n;idx++){
+		for(ll val=x;val>0;val--){
+			if(val >= price[idx])
+				dp[val] = max(dp[val], dp[val - price[idx]] + pages[idx]);
+		}
+		// cout<<idx<<": ";print(dp);
 	}
-	cout<<dp[x]<<endl;
+	
+	cout<<*max_element(all(dp))<<endl;
 }
 
 int main(){
 	FAST;
-	solve2();
+	solve();
 	return 0;
 }

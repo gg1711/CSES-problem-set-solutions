@@ -23,48 +23,28 @@ using namespace std;
 #define size(a)	(int)a.size()
 
 ll inf = 1e10;
-const ll N = 1e6+5;
-ll dp[N][105];
 
-ll memo(vecll &coin, ll val, ll idx){
-	//can't do space optimisation in top down 
-}
-
-//topDown
-void solve(){
-	ll n,x;
-	cin>>n>>x;
-
-	vecll coin(n);
-	for(ll &i:coin) cin>>i;
-	memset(dp,-1,sizeof(dp));
-	ll ans = memo(coin,x,0);
-
-	cout<<ans<<endl;
-
-}
-
-//BottomUp
-void solve2(){
-	ll n,x;
-	cin>>n>>x;
-
-	vecll coin(n);
-	for(ll &i:coin) cin>>i;
-
-	//no of ways to form x
-	vecll dp(x+1,0);
-
-	dp[0]=1;
-	sort(all(coin));
-	for(ll c:coin){
-		for(ll val=1;val<=x;val++)
-			if(val >= c){
-				dp[val]+=dp[val-c];
-				dp[val]%=mod;
-			}
+ll getMax(ll n){
+	ll val = n%10;
+	while(n){
+		val = max(val,n%10);
+		n/=10;
 	}
-	cout<<dp[x]<<endl;
+	return val;
+}
+
+//Greedy
+void solve2(){
+	ll n;
+	cin>>n;
+
+	ll cnt=0;
+	while(n){
+		ll num = getMax(n);
+		n-=num;
+		cnt++;
+	}
+	cout<<cnt<<endl;
 }
 
 int main(){
