@@ -20,60 +20,29 @@ using namespace std;
 #define mod 1000000007
 #define F first
 #define S second
-#define sz(a)	(int)(a).size()
+#define size(a)	(int)a.size()
 
 ll inf = 1e10;
 
-vector<veci> dp;
 
-int memo(veci &price, veci &pages, int val, int idx){
-	if(val < 0) return -inf;
-	if(idx>=sz(price)) return 0;
-	if(dp[val][idx]!=-1) return dp[val][idx];
-	return dp[val][idx] = max(memo(price, pages, val,idx+1),pages[idx] +  memo(price, pages, val - price[idx], idx+1));
-}
-
-//topDown TLE
-void solve2(){
-	int n, x;
-	cin>>n>>x;
-
-	veci price(n), pages(n);
-
-	for(auto &i:price) cin>>i;
-	for(auto &i:pages) cin>>i;
-
-	dp.assign(x+2,veci(n+2,-1));
-
-	cout<<memo(price, pages,x,0)<<endl;;
-}
-
-
-//bottomUp
 void solve(){
-	ll n, x;
-	cin>>n>>x;
-
-	vecll price(n), pages(n);
-
-	for(auto &i:price) cin>>i;
-	for(auto &i:pages) cin>>i;
-
-	vecll dp(x+1,0);
+	ll n;
+	cin>>n;
+	vecll a(n);
+	for(auto &i:a) cin>>i;
+	sort(all(a));
 	
-	for(ll idx=0;idx<n;idx++){
-		for(ll val=x;val>0;val--){
-			if(val >= price[idx])
-				dp[val] = max(dp[val], dp[val - price[idx]] + pages[idx]);
-		}
-		// cout<<idx<<": ";print(dp);
-	}
-	
-	cout<<*max_element(all(dp))<<endl;
+	ll sum=0;
+	for(ll idx=0;idx<n-1;idx++)
+		sum+=a[idx];
+
+	if(sum>a[n-1]) cout<<sum+a[n-1]<<endl;
+	else cout<<2*a[n-1]<<endl;
+
 }
 
 int main(){
 	FAST;
-	solve2();
+	solve();
 	return 0;
 }

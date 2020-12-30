@@ -24,56 +24,34 @@ using namespace std;
 
 ll inf = 1e10;
 
-vector<veci> dp;
 
-int memo(veci &price, veci &pages, int val, int idx){
-	if(val < 0) return -inf;
-	if(idx>=sz(price)) return 0;
-	if(dp[val][idx]!=-1) return dp[val][idx];
-	return dp[val][idx] = max(memo(price, pages, val,idx+1),pages[idx] +  memo(price, pages, val - price[idx], idx+1));
-}
-
-//topDown TLE
+//topDown
 void solve2(){
-	int n, x;
-	cin>>n>>x;
-
-	veci price(n), pages(n);
-
-	for(auto &i:price) cin>>i;
-	for(auto &i:pages) cin>>i;
-
-	dp.assign(x+2,veci(n+2,-1));
-
-	cout<<memo(price, pages,x,0)<<endl;;
+	
 }
-
 
 //bottomUp
 void solve(){
-	ll n, x;
-	cin>>n>>x;
+	ll n;
+	cin>>n;
+	vecll a(n);
 
-	vecll price(n), pages(n);
+	for(auto &i:a) cin>>i;
 
-	for(auto &i:price) cin>>i;
-	for(auto &i:pages) cin>>i;
-
-	vecll dp(x+1,0);
+	set<int>st;
 	
-	for(ll idx=0;idx<n;idx++){
-		for(ll val=x;val>0;val--){
-			if(val >= price[idx])
-				dp[val] = max(dp[val], dp[val - price[idx]] + pages[idx]);
+	for(auto val:a){
+		auto itr = st.lower_bound(val);
+		if(itr!=st.end()){
+			st.erase(itr);
 		}
-		// cout<<idx<<": ";print(dp);
+		st.insert(val);
 	}
-	
-	cout<<*max_element(all(dp))<<endl;
+	cout<<sz(st)<<endl;
 }
 
 int main(){
-	FAST;
-	solve2();
+	FAST
+	solve();
 	return 0;
 }

@@ -24,56 +24,58 @@ using namespace std;
 
 ll inf = 1e10;
 
-vector<veci> dp;
+int dp[100005][105];
 
-int memo(veci &price, veci &pages, int val, int idx){
-	if(val < 0) return -inf;
-	if(idx>=sz(price)) return 0;
-	if(dp[val][idx]!=-1) return dp[val][idx];
-	return dp[val][idx] = max(memo(price, pages, val,idx+1),pages[idx] +  memo(price, pages, val - price[idx], idx+1));
+ll memo(vecll &a, ll sum, ll idx){
+	//will write later
+
 }
 
-//topDown TLE
+
+//topDown
 void solve2(){
-	int n, x;
-	cin>>n>>x;
-
-	veci price(n), pages(n);
-
-	for(auto &i:price) cin>>i;
-	for(auto &i:pages) cin>>i;
-
-	dp.assign(x+2,veci(n+2,-1));
-
-	cout<<memo(price, pages,x,0)<<endl;;
+	ll n;
+	cin>>n;
+	vecll a(n);
+	ll sum=0;
+	for(auto &val:a){ 
+		cin>>val;
+		sum+=val;
+	}
+	memset(dp,-1,sizeof(dp));
+	memo(a,sum,n-1);
 }
 
 
 //bottomUp
 void solve(){
-	ll n, x;
-	cin>>n>>x;
-
-	vecll price(n), pages(n);
-
-	for(auto &i:price) cin>>i;
-	for(auto &i:pages) cin>>i;
-
-	vecll dp(x+1,0);
-	
-	for(ll idx=0;idx<n;idx++){
-		for(ll val=x;val>0;val--){
-			if(val >= price[idx])
-				dp[val] = max(dp[val], dp[val - price[idx]] + pages[idx]);
-		}
-		// cout<<idx<<": ";print(dp);
+	ll n;
+	cin>>n;
+	vecll a(n);
+	ll sum=0;
+	for(auto &val:a){ 
+		cin>>val;
+		sum+=val;
 	}
-	
-	cout<<*max_element(all(dp))<<endl;
+	vector<bool> dp(sum+1,0);
+
+	dp[0]=1;
+	for(ll val:a){
+		for(ll idx=sum;idx>=val;idx--){
+			dp[idx] = dp[idx] | dp[idx-val];
+		}
+	}
+	ll cnt=0;
+	for(ll idx=1;idx<=sum;idx++) 
+		if(dp[idx]) cnt++;
+	cout<<cnt<<endl;
+	for(ll idx=1;idx<=sum;idx++)
+		if(dp[idx]) cout<<idx<<" ";
+
 }
 
 int main(){
 	FAST;
-	solve2();
+	solve();
 	return 0;
 }

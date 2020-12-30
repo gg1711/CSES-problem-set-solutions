@@ -24,56 +24,52 @@ using namespace std;
 
 ll inf = 1e10;
 
-vector<veci> dp;
+const ll N = (505*505)/2;
 
-int memo(veci &price, veci &pages, int val, int idx){
-	if(val < 0) return -inf;
-	if(idx>=sz(price)) return 0;
-	if(dp[val][idx]!=-1) return dp[val][idx];
-	return dp[val][idx] = max(memo(price, pages, val,idx+1),pages[idx] +  memo(price, pages, val - price[idx], idx+1));
+ll dp[N][505];
+
+ll memo(ll reqSum,ll sum,ll idx, ll &n){
+	// cout<<sum<<" "<<idx<<endl;
+	if(sum==reqSum) return 1;
+	if(idx > n || sum>reqSum) return 0;
+	if(dp[sum][idx]!=-1) return dp[sum][idx];
+	return dp[sum][idx] = (memo(reqSum, sum+idx, idx+1,n) + memo(reqSum, sum,idx+1,n))%mod;
 }
 
-//topDown TLE
+ll power(ll a, ll n){
+	if(n==1)
+		return a;
+	ll ans = power(a,n/2)%mod;
+	ans=(ans*ans)%mod;
+
+	if(n%2) ans = ans*a;
+	return ans%mod;
+}
+
+//topDown
 void solve2(){
-	int n, x;
-	cin>>n>>x;
-
-	veci price(n), pages(n);
-
-	for(auto &i:price) cin>>i;
-	for(auto &i:pages) cin>>i;
-
-	dp.assign(x+2,veci(n+2,-1));
-
-	cout<<memo(price, pages,x,0)<<endl;;
+	ll n;
+	cin>>n;
+	ll sum=0;
+	for(int i=1;i<=n;i++)
+		sum+=i;
+	memset(dp,-1,sizeof(dp));
+	if(sum%2)
+		cout<<0<<endl;
+	else{
+		ll ans = memo(sum/2,0,1,n);
+		ans = (ans * power(2,mod-2))%mod;
+		cout<<ans<<endl;
+	}
 }
-
 
 //bottomUp
 void solve(){
-	ll n, x;
-	cin>>n>>x;
-
-	vecll price(n), pages(n);
-
-	for(auto &i:price) cin>>i;
-	for(auto &i:pages) cin>>i;
-
-	vecll dp(x+1,0);
 	
-	for(ll idx=0;idx<n;idx++){
-		for(ll val=x;val>0;val--){
-			if(val >= price[idx])
-				dp[val] = max(dp[val], dp[val - price[idx]] + pages[idx]);
-		}
-		// cout<<idx<<": ";print(dp);
-	}
-	
-	cout<<*max_element(all(dp))<<endl;
 }
 
 int main(){
-	FAST;
+	FAST
 	solve2();
 	return 0;
 }

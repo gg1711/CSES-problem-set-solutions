@@ -24,56 +24,39 @@ using namespace std;
 
 ll inf = 1e10;
 
-vector<veci> dp;
+ll dp[5005][5005];
 
-int memo(veci &price, veci &pages, int val, int idx){
-	if(val < 0) return -inf;
-	if(idx>=sz(price)) return 0;
-	if(dp[val][idx]!=-1) return dp[val][idx];
-	return dp[val][idx] = max(memo(price, pages, val,idx+1),pages[idx] +  memo(price, pages, val - price[idx], idx+1));
+ll memo(vecll &a, ll left, ll right){
+	if(left>right) return 0;
+
+	if(dp[left][right]!=-1) return dp[left][right];
+
+	ll c1 = a[left] + min(memo(a,left+2,right), memo(a, left+1,right-1));
+	ll c2 = a[right] + min(memo(a,left+1,right-1), memo(a, left,right-2));
+
+	return dp[left][right] = max(c1,c2);
 }
 
-//topDown TLE
+
+//topDown
 void solve2(){
-	int n, x;
-	cin>>n>>x;
-
-	veci price(n), pages(n);
-
-	for(auto &i:price) cin>>i;
-	for(auto &i:pages) cin>>i;
-
-	dp.assign(x+2,veci(n+2,-1));
-
-	cout<<memo(price, pages,x,0)<<endl;;
+	ll n;
+	cin>>n;
+	vecll a(n);
+	memset(dp,-1,sizeof(dp));
+	for(auto &val:a) cin>>val;
+	ll ans = memo(a,0,sz(a)-1);	
+	cout<<ans<<endl;
 }
-
 
 //bottomUp
 void solve(){
-	ll n, x;
-	cin>>n>>x;
-
-	vecll price(n), pages(n);
-
-	for(auto &i:price) cin>>i;
-	for(auto &i:pages) cin>>i;
-
-	vecll dp(x+1,0);
 	
-	for(ll idx=0;idx<n;idx++){
-		for(ll val=x;val>0;val--){
-			if(val >= price[idx])
-				dp[val] = max(dp[val], dp[val - price[idx]] + pages[idx]);
-		}
-		// cout<<idx<<": ";print(dp);
-	}
-	
-	cout<<*max_element(all(dp))<<endl;
+
 }
 
 int main(){
-	FAST;
+	FAST
 	solve2();
 	return 0;
 }
