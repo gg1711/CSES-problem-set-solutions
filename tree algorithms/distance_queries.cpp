@@ -28,55 +28,83 @@ vector<vecll> g;
 
 vector<vecll> dis;
 
+vecll tin, tout, depth;
 
-void dfs(ll u, ll par){
+ll timer=0;
+
+void dfs(ll u, ll par, ll d){
+	timer++;
+	tin[u]=timer;
+	depth[u]=d;
 	dis[u][0] = par;
 	for(int i=1;i<=20;i++){
 		if(dis[u][i-1]!=-1)
 			dis[u][i] = dis[dis[u][i-1]][i-1];
 		else
-			break;	
+			dis[u][i]=-1;	
 	}
 
 	for(ll v:g[u]){
 		if(v!=par)
-			dfs(v,u);
+			dfs(v,u,d+1);
 	}
+	timer++;
+	tout[u]=timer;
 }
 
-ll query(ll x, ll k){
-	ll node = x;
+bool is_ancestor(ll u,ll v){
+	return (tin[u]<=tin[v] && tout[u]>=tout[v]); //equality when u==v
+}
 
-	for(ll i=20;i>=0 && node!=-1;i--){
-		if(k & (1<<i)){
-			// cout<<(1<<i)<<endl;
-			node = dis[node][i];
+ll query(ll x, ll y){
+	ll lca;
+	if(is_ancestor(x,y))
+		lca = x;
+
+	else if(is_ancestor(y,x))
+		lca = y;
+
+	else{
+		ll node;
+		ll temp=x;
+		for(int i=20;i>-1;i--){
+			node = dis[x][i];
+			// cout<<i<<" "<<x<<" "<<node<<endl;
+			if(node!=-1 && is_ancestor(node,y)==0)
+				x=node;
+
 		}
+		lca= dis[x][0];
+		x=temp;
 	}
-	return node;
+
+	return depth[x]+depth[y]- 2*depth[lca];
 }
-
-
 
 void solve(){
 	ll q;
 	cin>>n>>q;
 	g.resize(n+1);
 	dis.assign(n+1, vecll(22,-1));
+	tin.assign(n+1,-1);
+	tout.assign(n+1,-1);
+	depth.assign(n+1,-1);
+
 	ll u,v;
 	for(int i=2;i<=n;i++){
-		cin>>u;
-		g[i].pb(u);
-		g[u].pb(i);
+		cin>>u>>v;
+		g[v].pb(u);
+		g[u].pb(v);
 	}
-	dfs(1,-1);
+	dfs(1,-1,1);
 	// for(auto i:dis){
 	// 	print(i);
 	// }
-	ll x,k;
+	// print(depth);
+	ll x,y;
 	for(ll i=0;i<q;i++){
-		cin>>x>>k;
-		cout<<query(x,k)<<endl;
+		cin>>x>>y;
+		cout<<query(x,y)<<endl;
 	}
 }
 
