@@ -22,58 +22,67 @@ using namespace std;
 #define S second
 #define sz(a)	(int)(a).size()
 
-ll inf = 1e18;
-const int N = 1e5 + 5;
+ll inf = 1e10;
+const int N = 2e5 + 5;
 ll n,m;
+vector<int>g[N];
+int vis[N];
+vector<int>res;
 
-vector<pll>g1[N];
-vector<pll>g2[N];
+//using Kahls algo
+void solve2(){
+	cin>>n>>m;
+	int a,b;
+	vecll indegree(n+1,0);
+	for(int i=0;i<m;i++){
+		cin>>a>>b;
+		g[a].pb(b);
+		indegree[b]++;
+	}
+	queue<ll>q;
+	for(ll i=1;i<=n;i++)
+		if(indegree[i]==0)q.push(i);
 
-vector<ll> d1,d2;
-void dijkstra(vector<pll>g[],vector<ll>&d, int src){
-	priority_queue<pll,vector<pll>,greater<pll>>pq;
-
-	pq.push({0,src});
-	d[src]=0;
-	while(sz(pq)>0){
-		pll node=pq.top();
-		pq.pop();
-		if(d[node.S]<node.F) continue;
-		for(auto p:g[node.S]){
-			if(d[p.F] > d[node.S] + p.S){
-				d[p.F] = d[node.S] + p.S;
-				pq.push({d[p.F], p.F});
-			}
+	while(!q.empty()){
+		int u=q.front();
+		q.pop();
+		res.pb(u);
+		for(int v:g[u]){
+			indegree[v]--;
+			if(indegree[v]==0)
+				q.push(v);
 		}
 	}
-	return;
-}
-
-void solve(){
-	cin>>n>>m;
-	int a,b,w;
-	d1.assign(n+1,inf);
-	d2.assign(n+1,inf);
-	for(int i=0;i<m;i++){
-		cin>>a>>b>>w;
-		g1[a].pb({b,w});
-		g2[b].pb({a,w}); //transpose graph
+	// print(res);
+	vecll dis(n+1,0);
+	vecll par(n+1,0);
+	dis[1]=1;
+	for(int u:res)
+		for(int v:g[u])
+			if(dis[u]!=0 && dis[v]<dis[u]+1){
+				dis[v]=dis[u]+1;
+				par[v]=u;
+			}
+	// print(dis);
+	if(dis[n]==0)
+		cout<<"IMPOSSIBLE"<<endl;
+	else{
+		cout<<dis[n]<<endl;
+		stack<int>st;
+		st.push(n);
+		while(par[st.top()]!=0)
+			st.push(par[st.top()]);
+		while(sz(st)!=0){
+			cout<<st.top()<<" ";
+			st.pop();
+		}
 	}
+		
 
-	dijkstra(g1,d1,1);
-	dijkstra(g2,d2,n);
-
-	ll ans=inf;
-
-	for(int u=1;u<n;u++)
-		for(auto p:g1[u])
-			ans = min(ans, d1[u] + d2[p.F] + p.S/2);
-	cout<<ans<<endl;
-	return ;
 }
 
 int main(){
 	FAST
-	solve();
+	solve2();
 	return 0;
 }

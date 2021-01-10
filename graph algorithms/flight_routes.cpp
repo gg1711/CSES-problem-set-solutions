@@ -24,25 +24,27 @@ using namespace std;
 
 ll inf = 1e18;
 const int N = 1e5 + 5;
-ll n,m;
+ll n,m,k;
 
-vector<pll>g1[N];
-vector<pll>g2[N];
+vector<pll>g[N];
 
-vector<ll> d1,d2;
-void dijkstra(vector<pll>g[],vector<ll>&d, int src){
+vector<vecll> dis;
+void dijkstra(int src){
 	priority_queue<pll,vector<pll>,greater<pll>>pq;
 
 	pq.push({0,src});
-	d[src]=0;
+
+	dis[src][0]=0;
+
 	while(sz(pq)>0){
 		pll node=pq.top();
 		pq.pop();
-		if(d[node.S]<node.F) continue;
+		if(dis[node.S][k-1]<node.F) continue;
 		for(auto p:g[node.S]){
-			if(d[p.F] > d[node.S] + p.S){
-				d[p.F] = d[node.S] + p.S;
-				pq.push({d[p.F], p.F});
+			if(dis[p.F][k-1] > node.F + p.S){
+				dis[p.F][k-1] = node.F + p.S;
+				pq.push({dis[p.F][k-1], p.F});
+				sort(all(dis[p.F]));
 			}
 		}
 	}
@@ -50,26 +52,19 @@ void dijkstra(vector<pll>g[],vector<ll>&d, int src){
 }
 
 void solve(){
-	cin>>n>>m;
+	cin>>n>>m>>k;
 	int a,b,w;
-	d1.assign(n+1,inf);
-	d2.assign(n+1,inf);
+	dis.assign(n+1,vecll(k,inf));
 	for(int i=0;i<m;i++){
 		cin>>a>>b>>w;
-		g1[a].pb({b,w});
-		g2[b].pb({a,w}); //transpose graph
+		g[a].pb({b,w});
 	}
 
-	dijkstra(g1,d1,1);
-	dijkstra(g2,d2,n);
+	dijkstra(1);
 
-	ll ans=inf;
-
-	for(int u=1;u<n;u++)
-		for(auto p:g1[u])
-			ans = min(ans, d1[u] + d2[p.F] + p.S/2);
-	cout<<ans<<endl;
-	return ;
+	for(int i=0;i<k;i++)
+		cout<<dis[n][i]<<" ";
+	cout<<endl;
 }
 
 int main(){
