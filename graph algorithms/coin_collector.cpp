@@ -25,49 +25,83 @@ using namespace std;
 ll inf = 1e18;
 const int N = 2e5 + 5;
 ll n,m;
-unordered_set<ll>g[N];
-set<pll>edges;
-vecll vis,deg,res;
+vecll g1[N],g2[N];
+set<ll>g3[N];
+vecll vis,val,new_val,dp;
 
-ll cnt=0;
+stack<ll>st;
+vector<int>res;
 
-void dfs(ll u){
+
+void dfs(vecll g[],ll u, ll flag=0){
+	vis[u]=1;	
+	
+	for(ll v:g[u])
+		if(!vis[v])
+			dfs(g,v,flag);
+
+	if(flag==0) st.push(u);
+	else res[u]=flag;
+}
+
+ll ans=0;
+ll dfs2(ll u){
 	// cout<<u<<endl;
-	while(sz(g[u])>0){
-		ll v=*g[u].begin();
-		cnt++;
-		g[u].erase(v);
-		g[v].erase(u);
-		dfs(v);
-	}
-	res.pb(u);
+	if(dp[u]!=-1) return dp[u];
+	ll sum = 0;
+	for(auto v:g3[u])
+			sum = max(sum,dfs2(v));
+	return dp[u]=sum+new_val[u];
 }
 
 void solve(){
 	cin>>n>>m;
-	deg.assign(n+1,0);
-	vis.assign(n+1,0);
 	ll a,b;
+	vis.assign(n+1,0);
+	res.assign(n+1,0);
+	val.assign(n+1,0);
+
+	for(int i=1;i<=n;i++)
+		cin>>val[i];
+
 	for(int i=0;i<m;i++){
 		cin>>a>>b;
-		deg[a]++;deg[b]++;
-		g[a].insert(b);
-		g[b].insert(a);
+		g1[a].pb(b);
+		g2[b].pb(a);
 	}
-	// print(deg);
-	for(int i=1;i<=n;i++){
-		if(deg[i]%2!=0){
-			cout<<"IMPOSSIBLE\n";
-			return;
+	for(int i=1;i<=n;i++)
+		if(vis[i]!=1)
+			dfs(g1,i,0);
+	vis.assign(n+1,0);
+	ll cnt=0;
+	while(sz(st)!=0){
+		ll u=st.top();
+		// chk(u);
+		st.pop();
+		if(vis[u]!=1){
+			cnt++;
+			dfs(g2,u,cnt);
 		}
 	}
-	dfs(1);
-	if(cnt!=m){
-		cout<<"IMPOSSIBLE\n";
-		return;
-	}
-	for(ll i:res)
-		cout<<i<<" ";
+	// cout<<cnt<<endl;
+	
+	//create another graph
+	new_val.assign(cnt+1,0);
+	for(int i=1;i<=n;i++)
+		new_val[res[i]]+=val[i];
+
+	for(ll u=1;u<=n;u++)
+		for(ll v:g1[u]){
+			if(res[u]<res[v])g3[res[u]].insert(res[v]);
+		}
+	// print(res);
+	// print(new_val);
+	vis.assign(cnt+1,0);
+	dp.assign(cnt+1,-1);
+	for(int i=1;i<=cnt;i++)
+		ans = max(ans,dfs2(i));
+	// print(dp);
+	cout<<ans<<endl;
 }
 
 int main(){
