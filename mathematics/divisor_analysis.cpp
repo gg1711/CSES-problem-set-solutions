@@ -37,8 +37,9 @@ void solve(){
 		sum%=mod;
 	}
 
-	ll prod=1;
-
+	/*
+	this method is correct but problem is inverse of 2 for (mod-1) doesn't exist
+	thus we avoid division by times[i]+1 and multiply by pre and suff array
 	ll ptotal=1;
 	ll pmod=mod-1;
 	for(int i=0;i<n;i++){
@@ -50,7 +51,20 @@ void solve(){
 		prod*=power(nums[i],((times[i]*ptotal)/2)%pmod);
 		prod%=mod;
 	}
-	if(n==100) prod=115729452;
+	*/
+	ll prod=1;
+	vector<ll> pre(n+1,1),suff(n+1,1);
+	ll pmod=mod-1;
+	for(ll i=1;i<=n;i++)
+		pre[i] = pre[i-1]*(times[i-1]+1)%pmod;
+	
+	for(ll i=n-2;i>-1;i--)
+		suff[i] = suff[i+1]*(times[i+1]+1)%pmod;
+
+	for(int i=0;i<n;i++){
+		prod = prod * power(nums[i],(times[i]*(times[i]+1)/2)%pmod * pre[i]%pmod * suff[i]%pmod) %mod;
+	}
+
 	cout<<total<<" "<<sum<<" "<<prod<<endl;
 }
 
